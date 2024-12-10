@@ -1,0 +1,160 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Page Title -->
+<div class="container mt-4 mb-5">
+  <h1 class="text-center text-primary">Blog Posts</h1>
+
+  <!-- Formulaire Add Blog -->
+  <div class="card shadow-lg rounded-3 mb-4">
+    <div class="card-header bg-gradient text-white">
+      <h2 class="mb-0">Add a Blog Post</h2>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100">Publish</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Liste des articles existants -->
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for post in posts %}
+      <div class="col">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{% url 'post_detail' post.pk %}" class="text-dark text-decoration-none">
+                <strong>{{ post.created_at|date:"F d, Y" }}</strong>
+              </a>
+            </h5>
+            <p class="card-text text-muted">{{ post.content|truncatewords:20 }}</p>
+
+            {% if post.media %}
+              <div class="media-container mb-3">
+                {% if post.media_type == 'image' %}
+                  <img src="{{ post.media.url }}" alt="Image" class="img-fluid rounded-3 media-container">
+                {% elif post.media_type == 'video' %}
+                  <video controls class="img-fluid rounded-3 media-container">
+                    <source src="{{ post.media.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                {% endif %}
+              </div>
+            {% else %}
+              <p class="text-muted">No media available for this post.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          No blog posts available. Be the first to create one!
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+<style>
+  /* Mise en page et background */
+  body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+  }
+
+  h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+  }
+
+  /* Formulaire d'ajout */
+  .card {
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #0066cc, #0099ff);
+    color: white;
+    font-size: 1.2rem;
+    padding: 20px;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .btn-primary {
+    background-color: #0066cc;
+    border: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    border-radius: 25px;
+  }
+
+  .btn-primary:hover {
+    background-color: #004d99;
+  }
+
+  /* Affichage des posts */
+  .media-container {
+    width: 100%; /* Utilisation de toute la largeur */
+    height: 250px; /* Taille fixe pour uniformité */
+    border-radius: 12px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    object-fit: cover; /* Maintient les proportions sans déformation */
+  }
+
+  .card-title a {
+    font-size: 1.1rem;
+    color: #333;
+    transition: color 0.3s ease;
+  }
+
+  .card-title a:hover {
+    color: #0066cc;
+  }
+
+  .card-text {
+    color: #6c757d;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Styles généraux pour le layout de grille */
+  .row-cols-1 {
+    margin-bottom: 20px;
+  }
+
+  /* Alertes et messages */
+  .alert {
+    border-radius: 15px;
+    padding: 15px;
+  }
+
+  .alert-info {
+    background-color: #e3f2fd;
+    color: #0277bd;
+  }
+
+  /* Pour l'ajout d'espace entre les éléments de la liste */
+  .g-4 {
+    gap: 20px;
+  }
+
+</style>
